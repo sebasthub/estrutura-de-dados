@@ -1,10 +1,10 @@
 package arvore;
 
-import main.TimeLine;
-
 public class No 
 {
-	private TimeLine valor;
+	private String valor;
+	private int cod;
+	private boolean lado;
 	private No esquerdo;
 	private No direito;
 	private int nivel;
@@ -23,17 +23,23 @@ public class No
 	}
 
 
-	No(int valor)
+	No(String valor, boolean lado, int cod)
 	{
+		this.lado = lado;
+		this.cod = cod;
 		this.valor = valor;
 	}
 	
 
-	public int getValor() {
+	public String getValor() {
 		return valor;
 	}
 
+	
 
+	public void setValor(String valor) {
+		this.valor = valor;
+	}
 
 	public No getEsquerdo() {
 		return esquerdo;
@@ -51,6 +57,22 @@ public class No
 		this.direito = direito;
 	}
 	
+	public int getCod() {
+		return cod;
+	}
+
+	public void setCod(int cod) {
+		this.cod = cod;
+	}
+
+	public boolean isLado() {
+		return lado;
+	}
+
+	public void setLado(boolean lado) {
+		this.lado = lado;
+	}
+
 	public void finalize()
 	{
 		System.out.println("LIBERADO");

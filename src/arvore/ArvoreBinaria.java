@@ -42,49 +42,92 @@ public class ArvoreBinaria
 		calculaNivelNos(raiz.getDireito(), nivel+1);
 	}
 	
-	public void insereValor (No raiz, int valor)
+	public void insereValor (No raiz, String valor, boolean lado, int codigo)
 	{	
 		//Verifica se a árvore está vazia
 		if (this.raiz == null)
 		{
-			this.raiz = new No(valor);
+			this.raiz = new No(valor,lado, codigo);
 			return;
 		}
 		
 		//Verifica para que lado da raiz vai andar
-		if (valor > raiz.getValor())
+		if (lado == true)
 		{
 			//Se nao tiver lado direito, insere
 			if (raiz.getDireito() == null)
 			{
-				raiz.setDireito(new No(valor));
+				raiz.setDireito(new No(valor, lado, codigo));
 				return;
 			}
-			
+			if (valor.compareTo(raiz.getValor()) < 0) {
+				insereValor(raiz.getEsquerdo(), valor, lado, codigo);
+				return;
+			}
 			//Insere recursivamente
-			insereValor(raiz.getDireito(), valor);
+			insereValor(raiz.getDireito(), valor, lado, codigo);
 		}
 		else
 		{	
 			if (raiz.getEsquerdo() == null)
 			{
-				raiz.setEsquerdo(new No(valor));
+				raiz.setEsquerdo(new No(valor, lado, codigo));
 				return;
 			}
-			
-			insereValor(raiz.getEsquerdo(), valor);
+			if (valor.compareTo(raiz.getValor()) < 0) {
+				insereValor(raiz.getEsquerdo(), valor, lado, codigo);
+				return;
+			}
+			insereValor(raiz.getDireito(), valor,lado,codigo);
 		}
 	}
 	
-	public No removeNo(int valor, No raiz) {
-		if(raiz.noFolha()) {
-			return null;
-		}else if(valor == raiz.getValor()){
-			
-		}
-	}
+	public No removeNo(String valor, No raiz) {
+        //verifica se é nulo
+        if(raiz==null)
+            return null;
+        else {
+            if(raiz.getValor()==valor) {
+                //remove no FOLHA
+                if(raiz.getEsquerdo()==null && raiz.getDireito()==null) {
+                    raiz=null;
+                    return null;
+                }
+                else {
+                    // remove no com apenas 1 filho
+                    if(raiz.getEsquerdo() ==null || raiz.getDireito() == null) {
+                        No temp;
+                        if(raiz.getEsquerdo()!=null)
+                            temp= raiz.getEsquerdo();
+                        else
+                            temp= raiz.getDireito();
+                        raiz=null;
+                        return temp;
+                    }
+                    //troca o no com o de valor mais proximo e exclui o ultimo 
+                    else {
+                        No temp = raiz.getEsquerdo();
+                        while(temp.getDireito() != null)
+                            temp= temp.getDireito();
+                        raiz.setValor(temp.getValor());
+                        temp.setValor(valor);
+                        raiz.setEsquerdo(removeNo(valor,raiz.getEsquerdo()));
+                        return raiz;
+                    }
+                }
+            }
+            //chama o metodo de forma recursiva
+            else{
+                if(valor.compareTo(raiz.getValor()) < 0)
+                    raiz.setEsquerdo(removeNo(valor,raiz.getEsquerdo()));
+                else
+                    raiz.setDireito(removeNo(valor,raiz.getDireito()));
+                return raiz;
+            }
+        }
+    }
 	
-	public boolean buscaValor(int valor, No raiz) {
+	public boolean buscaValor(String valor, No raiz) {
 		if(raiz == null) {
 			return false;
 		}
@@ -99,44 +142,40 @@ public class ArvoreBinaria
 		return false;
 	}
 	
-	public No buscaNo(int valor, No raiz) {
+	public No buscaNo(String valor, No raiz) {
 		if(raiz == null) {
 			return null;
 		}
 		if(valor == raiz.getValor()) {
+			System.out.println("piroca");
 			return raiz;
 		}
-		if(raiz.getDireito() != null && raiz.noFolha() != true) {
-			return buscaNo(valor, raiz.getDireito());
-		}else if(raiz.getEsquerdo() != null) {
-			return buscaNo(valor, raiz.getEsquerdo());
-		}
-		return null;
+		No n;
+		n = buscaNo(valor, raiz.getDireito());
+		if(n == null) buscaNo(valor, raiz.getEsquerdo());
+		return n;
 	}
 	
-	public No buscaNoAnterior(int valor, No raiz) {
+	public void buscaCodigo(No raiz,int codigo,boolean lado) {
 		if(raiz == null) {
-			return null;
+			return;
 		}
-		if(valor == raiz.getValor()) {
-			return raiz;
+		if(raiz.getCod() == codigo && raiz.isLado() == lado) {
+			System.out.println(raiz.getValor());
+		}else {
+			buscaCodigo(raiz.getDireito(), codigo, lado);
+			buscaCodigo(raiz.getEsquerdo(), codigo, lado);
 		}
-		if(raiz.getDireito() != null) {
-			No result = buscaNo(valor, raiz.getDireito());
-			if(result != null && result.getValor() == valor)return raiz;
-		}else if(raiz.getEsquerdo() != null) {
-			No result = buscaNo(valor, raiz.getEsquerdo());
-			if(result != null && result.getValor() == valor)return raiz;
-		}
-		return null;
 	}
-	
 	
 	public void imprimeArvore(No raiz)
 	{
 		if (raiz == null)
 			return;
-		
+		if(raiz.noFolha()) {
+			System.out.println(raiz.getValor());
+			return;
+		}
 		imprimeArvore(raiz.getEsquerdo());
 		System.out.println(raiz.getValor());
 		imprimeArvore(raiz.getDireito());
